@@ -316,12 +316,13 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
                 # Find the TREE line to know what the tip numbers are
                 if "TREE #" in lines[i]:
                     TREE = lines[i].replace("TREE #  1:  ","")
-                    TREE = TREE.replace(";   MP score: -1","")
+                    TREE = re.sub(";.*","",TREE)
                     TREE = TREE.replace("(","")
                     TREE = TREE.replace(")","")
                     TREE = TREE.replace(" ","")
                     TREE = TREE.replace("\n","")
                     TREE = TREE.split(",")
+                    #print TREE
                 # Find the dN,dS,S,N data for each tip in TREE
                 if "tree length for dN:" in lines[i]:
                     dn = lines[i]

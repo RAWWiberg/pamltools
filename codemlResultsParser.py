@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 This script takes a codeml results file from either
@@ -375,7 +375,7 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
                 print gene_name,",","no_data"
             else:
                 print gene_name,",",stop,",",N,",",S,",",dn,",",ds,","\
-                  ,omega,",",lnL,",",np,",",model,",".join(sp_dn),\
+                  ,omega,",",lnL,",",np,",",model,",",",".join(sp_dn),\
                   ",".join(sp_ds)
         #There are many more possibilities when model=0
         if nssites == "3":

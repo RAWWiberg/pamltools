@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 This script takes a codeml results file from either
@@ -23,8 +23,8 @@ import re
 import argparse
 import sys
 
-def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
-    read = open(fil, 'rb')
+def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
+    read = open(fil, 'r')
     lines = read.readlines()
     stop = "0"
 ####################################################################
@@ -37,75 +37,106 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
             w_tree_line = "none"
             ds_tree_line = "none"
             dn_tree_line = "none"
-            for i in range(0,len(lines)):
-                if "dS tree:\n" in lines[i]:
-                    # get tree with ds as branch labels
-                    ds_tree_line = i+1
-                    ds_tree = lines[ds_tree_line]
-                    ds_tree = ds_tree.replace(")", "")
-                    ds_tree = ds_tree.replace("\n", "")
-                    ds_tree = ds_tree.replace(")", "")
-                    ds_tree = ds_tree.replace(";", "")
-                    ds_tree = ds_tree.replace(" ", "")
-                    ds_tree = re.split(",", ds_tree)
-                    ds = []
-                    for l in ds_tree:
-                        ds.append(re.split(":", l)[1])
-                if "dN tree:\n" in lines [i]:
-                    # get tree with dn as branch labels
-                    dn_tree_line = i+1
-                    dn_tree = lines[dn_tree_line]
-                    dn_tree = dn_tree.replace(")", "")
-                    dn_tree = dn_tree.replace("\n", "")
-                    dn_tree = dn_tree.replace("(", "")
-                    dn_tree = dn_tree.replace(";", "")
-                    dn_tree = dn_tree.replace(" ", "")
-                    dn_tree = re.split(",", dn_tree)
-                    dn = []
-                    for m in dn_tree:
-                        dn.append(re.split(":", m)[1])
-                if "w ratios as labels for TreeView:\n" in lines[i]:
-                    # get tree with omega as branch labels
-                    w_tree_line = i+1
-                    w_tree = lines[w_tree_line]
-                    w_tree = w_tree.replace(")", "")
-                    w_tree = w_tree.replace("\n", "")
-                    w_tree = w_tree.replace("(", "")
-                    w_tree = w_tree.replace(";", "")
-                    w_tree = w_tree.replace(" ", "")
-                    w_tree = w_tree.replace("#", ":")
-                    w_tree = re.split(",", w_tree)
-                    dnds = []
-                    for n in w_tree:
-                        dnds.append(re.split(":", n)[1])
-                if "lnL(ntime: " in lines[i]:
-                    # get lnL estimate
-                    lnL_line = lines[i]
-                    lnL_values = re.split(":", lnL_line)[-1]
-                    np_values = re.split(":",lnL_line)[-2]
-                    lnL_values = lnL_values.replace(" ", "")
-                    lnL = float(re.split("\+", lnL_values)[0])
-                    np = np_values.replace(" ","")
-                    np = np_values.replace(")","")
-                if "???" in lines[i]:
-                    # check for premature stop codons
-                    stop = "1"
-                if "branch" in lines[i]:
-                    NSdata_s = i
-                    NSdata_e = i+5
-                    lines2 = lines[NSdata_s:NSdata_e]
-                    NSdata = re.sub("\s",",", lines2[2])
-                    NSdata = re.split(",+",NSdata)
-                    N = NSdata[3]
-                    S = NSdata[4]
-            if w_tree_line == "none" or ds_tree_line == "none"\
-               or dn_tree_line == "none":
-                # no calculations performed by CODEML. Sequences ambiguous.
-                print gene_name,",","no_data"
-            else:
-                print gene_name,",",stop,",",N,",",S,",",\
-                      ",".join(dn),",",",".join(ds),",",\
-                      ",".join(dnds),",",lnL,",",np,",",model,
+            if out == "f":
+                for i in range(0,len(lines)):
+                    if "dS tree:\n" in lines[i]:
+                        # get tree with ds as branch labels
+                        ds_tree_line = i+1
+                        ds_tree = lines[ds_tree_line]
+                        ds_tree = ds_tree.replace(")", "")
+                        ds_tree = ds_tree.replace("\n", "")
+                        ds_tree = ds_tree.replace(")", "")
+                        ds_tree = ds_tree.replace(";", "")
+                        ds_tree = ds_tree.replace(" ", "")
+                        ds_tree = re.split(",", ds_tree)
+                        ds = []
+                        for l in ds_tree:
+                            ds.append(re.split(":", l)[1])
+                    if "dN tree:\n" in lines [i]:
+                        # get tree with dn as branch labels
+                        dn_tree_line = i+1
+                        dn_tree = lines[dn_tree_line]
+                        dn_tree = dn_tree.replace(")", "")
+                        dn_tree = dn_tree.replace("\n", "")
+                        dn_tree = dn_tree.replace("(", "")
+                        dn_tree = dn_tree.replace(";", "")
+                        dn_tree = dn_tree.replace(" ", "")
+                        dn_tree = re.split(",", dn_tree)
+                        dn = []
+                        for m in dn_tree:
+                            dn.append(re.split(":", m)[1])
+                    if "w ratios as labels for TreeView:\n" in lines[i]:
+                        # get tree with omega as branch labels
+                        w_tree_line = i+1
+                        w_tree = lines[w_tree_line]
+                        w_tree = w_tree.replace(")", "")
+                        w_tree = w_tree.replace("\n", "")
+                        w_tree = w_tree.replace("(", "")
+                        w_tree = w_tree.replace(";", "")
+                        w_tree = w_tree.replace(" ", "")
+                        w_tree = w_tree.replace("#", ":")
+                        w_tree = re.split(",", w_tree)
+                        dnds = []
+                        for n in w_tree:
+                            dnds.append(re.split(":", n)[1])
+                    if "lnL(ntime:" in lines[i]:
+                        # get lnL estimate
+                        lnL_line = lines[i]
+                        lnL_values = re.split(":", lnL_line)[-1]
+                        np_values = re.split(":",lnL_line)[-2]
+                        lnL_values = lnL_values.replace(" ", "")
+                        lnL = float(re.split("\+", lnL_values)[0])
+                        np = np_values.replace(" ","")
+                        np = np_values.replace(")","")
+                    if "???" in lines[i]:
+                        # check for premature stop codons
+                        stop = "1"
+                    if "branch" in lines[i]:
+                        NSdata_s = i
+                        NSdata_e = i+5
+                        lines2 = lines[NSdata_s:NSdata_e]
+                        NSdata = re.sub("\s",",", lines2[2])
+                        NSdata = re.split(",+",NSdata)
+                        N = NSdata[3]
+                        S = NSdata[4]
+                if w_tree_line == "none" or ds_tree_line == "none"\
+                or dn_tree_line == "none":
+                    # no calculations performed by CODEML. Sequences ambiguous.
+                    print(gene_name,",","no_data")
+                else:
+                    print(gene_name,",",stop,",",N,",",S,",",\
+                          ",".join(dn),",",",".join(ds),",",\
+                          ",".join(dnds),",",lnL,",",np,",",model)
+            elif out == "r":
+                for i in range(0,len(lines)):
+                    if "lnL(ntime:" in lines[i]:
+                        # get lnL estimate
+                        lnL_line = lines[i]
+                        lnL_values = re.split(":", lnL_line)[-1]
+                        np_values = re.split(":",lnL_line)[-2]
+                        lnL_values = lnL_values.replace(" ", "")
+                        lnL = float(re.split("\+", lnL_values)[0])
+                        np = np_values.replace(" ","")
+                        np = np_values.replace(")","")
+                    if "???" in lines[i]:
+                        # check for premature stop codons
+                        stop = "1"
+                    if "branch" in lines[i]:
+                        NSdata_s = i
+                        NSdata_e = i+5
+                        lines2 = lines[NSdata_s:NSdata_e]
+                        NSdata = re.sub("\s",",", lines2[2])
+                        NSdata = re.split(",+",NSdata)
+                        N = NSdata[3]
+                        S = NSdata[4]
+                    if "w (dN/dS) for branches:" in lines[i]:
+                        w_line = lines[i]
+                        w_line = w_line.split(":")[1].split()
+                        #print(w_line)
+                print(gene_name,",",stop,",",N,",",S,",",\
+                      ",".join(w_line),",",lnL,",",np,",",model)
+                    
+                
         if nssites == "2":
             #print "BRANCH-SITE MODEL"
             # if model = 2 and omega is estimated
@@ -160,11 +191,11 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
                     c2afw=frgrndw_line[4]
                     c2bfw=frgrndw_line[5]
 
-            print gene_name,\
+            print(gene_name,\
                   ",",c0p,",",c1p,",",c2ap,",",c2bp,\
                   ",",c0bw,",",c1bw,",",c2abw,",",c2bbw,\
                   ",",c0fw,",",c1fw,",",c2afw,",",c2bfw,\
-                  lnL,",",np,",",stop,",",model,
+                  lnL,",",np,",",stop,",",model)
 ####################################################################
     elif runmode == "0" and om == "fixed" and model == "2":
         #print "NOT WRITTEN THIS PART OF PARSER YET"
@@ -241,11 +272,12 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
             if w_tree_line == "none" or ds_tree_line == "none"\
                or dn_tree_line == "none":
                 # no calculations performed by CODEML. Sequences ambiguous.
-                print gene_name,",","no_data"
+                print(gene_name,",","no_data")
             else:
-                print gene_name,",",stop,",",N,",",S,",",\
+                print(gene_name,",",stop,",",N,",",S,",",\
                       ",".join(dn),",",",".join(ds),",",\
-                      ",".join(dnds),",",lnL,",",np,",",model,
+                      ",".join(dnds),",",lnL,",",np,",",model)
+            
         if nssites == "2":
             #print "BRANCH-SITE MODEL"
             # if model = 2 and omega is estimated
@@ -300,10 +332,10 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
                     c2afw=frgrndw_line[4]
                     c2bfw=frgrndw_line[5]
 
-            print gene_name,",",c0p,",",c1p,",",c2ap,",",c2bp,\
+            print(gene_name,",",c0p,",",c1p,",",c2ap,",",c2bp,\
                   ",",c0bw,",",c1bw,",",c2abw,",",c2bbw,\
                   ",",c0fw,",",c1fw,",",c2afw,",",c2bfw,\
-                  lnL,",",np,",",stop,",",model,
+                  lnL,",",np,",",stop,",",model)
 
 ####################################################################
     elif runmode == "0" and om == "est" and model == "0":
@@ -341,7 +373,8 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
                     omega_dat = omega_dat.replace(" ", "")
                     omega_dat = re.split("=", omega_dat)
                     omega = float(omega_dat[1])
-                if "lnL(ntime: " in lines[i]:
+                if "lnL(ntime:" in lines[i]:
+                    #print(lines[i])
                     lnL_line = lines[i]
                     lnL_values = re.split(":", lnL_line)[-1]
                     np_values = re.split(":",lnL_line)[-2]
@@ -373,27 +406,166 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
                     S = NSdata[4]
             if omega == "none":
                 # no calculations performed by CODEML. Sequences ambiguous
-                print gene_name,",","no_data"
+                print(gene_name,",","no_data")
             else:
-                print gene_name,",",stop,",",N,",",S,",",dn,",",ds,","\
+                print(gene_name,",",stop,",",N,",",S,",",dn,",",ds,","\
                   ,omega,",",lnL,",",np,",",model,",",",".join(sp_dn),",",\
-                  ",".join(sp_ds)
+                  ",".join(sp_ds))
         #There are many more possibilities when model=0
         if nssites == "3":
-            print "SITES MODEL (NO BRANCHES)"
+            print("SITES MODEL (NO BRANCHES)")
         if nssites == "4":
-            print "SITES MODEL (NO BRANCHES)"
+            print("SITES MODEL (NO BRANCHES)")
         if nssites == "5":
-            print "SITES MODEL (NO BRANCHES)"
+            print("SITES MODEL (NO BRANCHES)")
         if nssites == "6":
-            print "SITES MODEL (NO BRANCHES)"
+            print("SITES MODEL (NO BRANCHES)")
         if nssites == "7":
-            print "SITES MODEL (NO BRANCHES)"
+            print("SITES MODEL (NO BRANCHES)")
+            
+####################################################################
+    if runmode == "0" and om == "est" and model == "1":
+        if nssites == "0":
+            # if model = 1 and omega is estimated
+            # different dN/dS values for each branch,
+            # and 1 site class within a sequence
+            # output file will be formatted a particular way.
+            w_tree_line = "none"
+            ds_tree_line = "none"
+            dn_tree_line = "none"
+            for i in range(0,len(lines)):
+                if "dS tree:\n" in lines[i]:
+                    # get tree with ds as branch labels
+                    ds_tree_line = i+1
+                    ds_tree = lines[ds_tree_line]
+                    ds_tree = ds_tree.replace(")", "")
+                    ds_tree = ds_tree.replace("\n", "")
+                    ds_tree = ds_tree.replace(")", "")
+                    ds_tree = ds_tree.replace(";", "")
+                    ds_tree = ds_tree.replace(" ", "")
+                    ds_tree = re.split(",", ds_tree)
+                    ds = []
+                    for l in ds_tree:
+                        ds.append(re.split(":", l)[1])
+                if "dN tree:\n" in lines [i]:
+                    # get tree with dn as branch labels
+                    dn_tree_line = i+1
+                    dn_tree = lines[dn_tree_line]
+                    dn_tree = dn_tree.replace(")", "")
+                    dn_tree = dn_tree.replace("\n", "")
+                    dn_tree = dn_tree.replace("(", "")
+                    dn_tree = dn_tree.replace(";", "")
+                    dn_tree = dn_tree.replace(" ", "")
+                    dn_tree = re.split(",", dn_tree)
+                    dn = []
+                    for m in dn_tree:
+                        dn.append(re.split(":", m)[1])
+                if "w ratios as labels for TreeView:\n" in lines[i]:
+                    # get tree with omega as branch labels
+                    w_tree_line = i+1
+                    w_tree = lines[w_tree_line]
+                    w_tree = w_tree.replace(")", "")
+                    w_tree = w_tree.replace("\n", "")
+                    w_tree = w_tree.replace("(", "")
+                    w_tree = w_tree.replace(";", "")
+                    w_tree = w_tree.replace(" ", "")
+                    w_tree = w_tree.replace("#", ":")
+                    w_tree = re.split(",", w_tree)
+                    dnds = []
+                    for n in w_tree:
+                        dnds.append(re.split(":", n)[1])
+                if "lnL(ntime: " in lines[i]:
+                    # get lnL estimate
+                    lnL_line = lines[i]
+                    lnL_values = re.split(":", lnL_line)[-1]
+                    np_values = re.split(":",lnL_line)[-2]
+                    lnL_values = lnL_values.replace(" ", "")
+                    lnL = float(re.split("\+", lnL_values)[0])
+                    np = np_values.replace(" ","")
+                    np = np_values.replace(")","")
+                if "???" in lines[i]:
+                    # check for premature stop codons
+                    stop = "1"
+                if "branch" in lines[i]:
+                    NSdata_s = i
+                    NSdata_e = i+5
+                    lines2 = lines[NSdata_s:NSdata_e]
+                    NSdata = re.sub("\s",",", lines2[2])
+                    NSdata = re.split(",+",NSdata)
+                    N = NSdata[3]
+                    S = NSdata[4]
+            if w_tree_line == "none" or ds_tree_line == "none"\
+               or dn_tree_line == "none":
+                # no calculations performed by CODEML. Sequences ambiguous.
+                print(gene_name,",","no_data")
+            else:
+                print(gene_name,",",stop,",",N,",",S,",",\
+                      ",".join(dn),",",",".join(ds),",",\
+                      ",".join(dnds),",",lnL,",",np,",",model)
+        if nssites == "2":
+            #print "BRANCH-SITE MODEL"
+            # if model = 2 and omega is estimated
+            # different dN/dS values on some branches,
+            # and 4 site classes within a sequence
+            # only two branch types are allowed: foreground and background
+            # output file will be formatted a particular way.
+            for i in range(0,len(lines)):
+                if "lnL(ntime: " in lines[i]:
+                    # get lnL estimate and np (number of parameters)
+                    lnL_line = lines[i]
+                    lnL_line = re.split(":", lnL_line)
+                    lnL_values = lnL_line[-1]
+                    lnL_values = lnL_values.replace(" ", "")
+                    lnL = float(re.split("\+", lnL_values)[0])
+                    np = lnL_line[2]
+                    np = np.replace(" ","")
+                    np = np.replace(")","")
+                if "???" in lines[i]:
+                    # check for premature stop codons
+                    stop = "1"
+                if "site class " in lines[i]:
+                    # get the omega estimates for each class
+                    # and the proportion of sites that belong
+                    # to each class.
+                    #print lines[i+1]
+                    prop_line = lines[i+1]
+                    prop_line = prop_line.replace("\n","")
+                    prop_line = prop_line.replace(" ",",")
+                    prop_line = re.split(",+",prop_line)
+                    #print lines[i+2]
+                    bkgrndw_line = lines[i+2]
+                    bkgrndw_line = bkgrndw_line.replace("\n","")
+                    bkgrndw_line = bkgrndw_line.replace(" ",",")
+                    bkgrndw_line = re.split(",+",bkgrndw_line)
+                    #print lines[i+3]
+                    frgrndw_line = lines[i+3]
+                    frgrndw_line = frgrndw_line.replace("\n","")
+                    frgrndw_line = frgrndw_line.replace(" ",",")
+                    frgrndw_line = re.split(",+",frgrndw_line)
+                    #print prop_line,bkgrndw_line,frgrndw_line
+                    c0p=prop_line[1]
+                    c1p=prop_line[2]
+                    c2ap=prop_line[3]
+                    c2bp=prop_line[4]
+                    c0bw=bkgrndw_line[2]
+                    c1bw=bkgrndw_line[3]
+                    c2abw=bkgrndw_line[4]
+                    c2bbw=bkgrndw_line[5]
+                    c0fw=frgrndw_line[2]
+                    c1fw=frgrndw_line[3]
+                    c2afw=frgrndw_line[4]
+                    c2bfw=frgrndw_line[5]
 
+            print(gene_name,\
+                  ",",c0p,",",c1p,",",c2ap,",",c2bp,\
+                  ",",c0bw,",",c1bw,",",c2abw,",",c2bbw,\
+                  ",",c0fw,",",c1fw,",",c2afw,",",c2bfw,\
+                  lnL,",",np,",",stop,",",model)
+                
 ####################################################################
     elif runmode == "0" and om == "fixed" and model == "0":
         # one dN/dS across the whole tree and fixed
-        print "NOT WRITTEN THIS PART OF PARSER YET"
+        print("NOT WRITTEN THIS PART OF PARSER YET")
         omega = 1
         for i in range(0, len(lines)):
             if "lnL" in lines[i]:
@@ -406,7 +578,7 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
                     lnl = float(re.split("  ",data[0])[4])
             if "???" in lines[i]:
                 stop = "1"
-        print gene_name,",",stop,",",lnl
+        print(gene_name,",",stop,",",lnl)
 ####################################################################
     elif runmode == "-3":
         # Pairwise Bayesian estimation of dN/dS
@@ -457,10 +629,10 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
         if ml_omega == "none":
                 # no calculations performed by CODEML.
                 # Sequences ambiguous
-            print gene_name,",","no_data"            
+            print(gene_name,",","no_data")
         else:
-            print gene_name,",",stop,",",N,",",S,",",dn,",",ds,","\
-                  ,ml_omega,",",lnL,",",b_omega,",",b_p,",",model
+            print(gene_name,",",stop,",",N,",",S,",",dn,",",ds,","\
+                  ,ml_omega,",",lnL,",",b_omega,",",b_p,",",model)
 ####################################################################
     elif runmode == "-2":
         # Pairwise ML estimation of dN/dS
@@ -484,21 +656,22 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name):
         if omega == "none":
                 # no calculations performed by CODEML.
                 # Sequences ambiguous
-            print gene_name,",","no_data"
+            print(gene_name,",","no_data")
         else:
-            print gene_name,",",stop,",",N,",",S,",",dn,",",ds,","\
-                  ,omega,",",lnL,",",model
+            print(gene_name,",",stop,",",N,",",S,",",dn,",",ds,","\
+                  ,omega,",",lnL,",",model)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=globals()['__doc__'])
 
     parser.add_argument('-fil',
                        help = 'paml results file')
-    
+    parser.add_argument('-out',default="r",
+                       help = 'reduced (r) or full (f) output')
     args = vars(parser.parse_args())
 
     try:
-        filename = re.split("_",args['fil'][:-12])
+        filename = re.split("_",args['fil'])
         #print filename #script tester line
         RM = str([rm for rm in filename if "rm" in rm])
         NS = str([ns for ns in filename if "NS" in ns])
@@ -510,6 +683,18 @@ if __name__ == "__main__":
             if "2" in M:
                 # Model=2 multiple w estimated
                 model = "2"
+                if "2" in NS:
+                    nssites = "2"
+                if "0" in NS:
+                    nssites = "0"
+                if "fo" in filename:
+                    om = "fixed"
+                if "eo" in filename:
+                    om = "est"
+
+            elif "1" in M:
+                # w estimated separately for each branch
+                model = "1"
                 if "2" in NS:
                     nssites = "2"
                 if "0" in NS:
@@ -547,9 +732,9 @@ if __name__ == "__main__":
             if "eo" in filename:
                 om = "est"
                 
-        gene_name = filename[0] # get gene name from results file name
-        #print filename, om,model,nssites,gene_name # Script tester line
-        parse_codeml_results(args['fil'],runmode,om,model,nssites,gene_name)
+        gene_name = re.split("\.",args['fil'])[0] # get gene name from results file name
+        #print(filename, om,model,nssites,gene_name) # Script tester line
+        parse_codeml_results(args['fil'],runmode,om,model,nssites,gene_name,args['out'])
     except IOError:
         sys.stderr.write("stdout is closed")
         #stdout is closed, no point continuing

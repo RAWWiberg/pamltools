@@ -133,8 +133,44 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                         w_line = lines[i]
                         w_line = w_line.split(":")[1].split()
                         #print(w_line)
-                print(gene_name,",",stop,",",N,",",S,",",\
-                      ",".join(w_line),",",lnL,",",np,",",model)
+                    # Get average dN and dS values
+                    if "dN tree:\n" in lines[i]:
+                        # get tree with dn as branch labels
+                        dn_tree_line = i+1
+                        dn_tree = lines[dn_tree_line]
+                        dn_tree = dn_tree.replace(")", "")
+                        dn_tree = dn_tree.replace("\n", "")
+                        dn_tree = dn_tree.replace("(", "")
+                        dn_tree = dn_tree.replace(";", "")
+                        dn_tree = dn_tree.replace(" ", "")
+                        dn_tree = re.split(",", dn_tree)
+                        dn_tree=[re.split(":",i)[1] for i in dn_tree]
+                        dn_tree=[float(i) for i in dn_tree]
+                        dn = sum(dn_tree)/len(dn_tree)
+                    if "dS tree:\n" in lines[i]:
+                        # get tree with ds as branch labels
+                        ds_tree_line = i+1
+                        ds_tree = lines[ds_tree_line]
+                        ds_tree = ds_tree.replace(")", "")
+                        ds_tree = ds_tree.replace("\n", "")
+                        ds_tree = ds_tree.replace(")", "")
+                        ds_tree = ds_tree.replace(";", "")
+                        ds_tree = ds_tree.replace(" ", "")
+                        ds_tree = re.split(",", ds_tree)
+                        ds_tree=[re.split(":",i)[1] for i in ds_tree]
+                        ds_tree=[float(i) for i in ds_tree]
+                        ds = sum(ds_tree)/len(ds_tree)
+                    # Get dN and dS tree lengths
+                    if "tree length for dN:" in lines[i]:
+                        tree_dn=lines[i]
+                        tree_dn=tree_dn.replace("\n","")
+                        tree_dn=tree_dn.split(":")[1]
+                    if "tree length for dS:" in lines[i]:
+                        tree_ds=lines[i]
+                        tree_ds=tree_ds.replace("\n","")
+                        tree_ds=tree_ds.split(":")[1]
+                print(gene_name,",",stop,",",N,",",S,",",tree_dn,",",tree_ds,",",\
+                      dn,",",ds,",",",".join(w_line),",",lnL,",",np,",",model)
                     
                 
         if nssites == "2":
@@ -355,17 +391,17 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                     TREE = TREE.replace("\n","")
                     TREE = TREE.split(",")
                     #print TREE
-                # Find the dN,dS,S,N data for each tip in TREE
+                # Find the dN,dS,S,N data tree
                 if "tree length for dN:" in lines[i]:
-                    dn = lines[i]
-                    dn = dn.replace(" ", "")
-                    dn = dn.replace("\n", "")
-                    dn = re.split(":", dn)[1]
+                    tree_dn = lines[i]
+                    tree_dn = tree_dn.replace(" ", "")
+                    tree_dn = tree_dn.replace("\n", "")
+                    tree_dn = re.split(":", tree_dn)[1]
                 if "tree length for dS:" in lines[i]:
-                    ds = lines[i]
-                    ds = ds.replace(" ", "")
-                    ds = ds.replace("\n", "")
-                    ds = re.split(":", ds)[1]
+                    tree_ds = lines[i]
+                    tree_ds = tree_ds.replace(" ", "")
+                    tree_ds = tree_ds.replace("\n", "")
+                    tree_ds = re.split(":", tree_ds)[1]
                 if "omega (dN/dS)" in lines[i]:
                     omega_line = i
                     omega_dat = lines[omega_line]
@@ -398,8 +434,10 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                                 #print line2
                                 line2=re.sub("\s",",", line2)
                                 line2=re.split(",+",line2)
-                                sp_dn.append(line2[-5])
-                                sp_ds.append(line2[-4])
+                                sp_dn.append(float(line2[-5]))
+                                sp_ds.append(float(line2[-4]))
+                    sp_dn=sum(sp_dn)/len(sp_dn)
+                    sp_ds=sum(sp_ds)/len(sp_ds)
                     NSdata = re.sub("\s",",", lines2[2])
                     NSdata = re.split(",+",NSdata)
                     N = NSdata[3]
@@ -408,9 +446,8 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                 # no calculations performed by CODEML. Sequences ambiguous
                 print(gene_name,",","no_data")
             else:
-                print(gene_name,",",stop,",",N,",",S,",",dn,",",ds,","\
-                  ,omega,",",lnL,",",np,",",model,",",",".join(sp_dn),",",\
-                  ",".join(sp_ds))
+                print(gene_name,",",stop,",",N,",",S,",",tree_dn,",",tree_ds,\
+                      ",",sp_dn,",",sp_ds,",",omega,",",lnL,",",np,",",model)
         #There are many more possibilities when model=0
         if nssites == "3":
             print("SITES MODEL (NO BRANCHES)")
@@ -565,17 +602,15 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
 ####################################################################
     elif runmode == "0" and om == "fixed" and model == "0":
         # one dN/dS across the whole tree and fixed
-        print("NOT WRITTEN THIS PART OF PARSER YET")
+        # This part only prints the log-likelihood
         omega = 1
         for i in range(0, len(lines)):
             if "lnL" in lines[i]:
                 data = lines[i:]
                 data = [d for d in data if d != "\n"]
-                lnl = re.split("  ",data[0])[4]
+                lnl = re.split("  ",data[0])[2] 
                 if lnl == '':
                     lnl = float(re.split(":",re.split("  ",data[0])[3])[1])
-                else:
-                    lnl = float(re.split("  ",data[0])[4])
             if "???" in lines[i]:
                 stop = "1"
         print(gene_name,",",stop,",",lnl)

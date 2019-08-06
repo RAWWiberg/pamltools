@@ -226,7 +226,6 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                     c1fw=frgrndw_line[3]
                     c2afw=frgrndw_line[4]
                     c2bfw=frgrndw_line[5]
-
             print(gene_name,\
                   ",",c0p,",",c1p,",",c2ap,",",c2bp,\
                   ",",c0bw,",",c1bw,",",c2abw,",",c2bbw,\
@@ -322,7 +321,7 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
             # only two branch types are allowed: foreground and background
             # output file will be formatted a particular way.
             for i in range(0,len(lines)):
-                if "lnL(ntime: " in lines[i]:
+                if "lnL(ntime:" in lines[i]:
                     # get lnL estimate and np (number of parameters)
                     lnL_line = lines[i]
                     lnL_line = re.split(":", lnL_line)
@@ -367,7 +366,8 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                     c1fw=frgrndw_line[3]
                     c2afw=frgrndw_line[4]
                     c2bfw=frgrndw_line[5]
-
+            #print(gene_name)
+            #print(lnL_line)
             print(gene_name,",",c0p,",",c1p,",",c2ap,",",c2bp,\
                   ",",c0bw,",",c1bw,",",c2abw,",",c2bbw,\
                   ",",c0fw,",",c1fw,",",c2afw,",",c2bfw,\
@@ -608,12 +608,15 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
             if "lnL" in lines[i]:
                 data = lines[i:]
                 data = [d for d in data if d != "\n"]
-                lnl = re.split("  ",data[0])[2] 
+                lnl = re.split("\+", re.split("\)\:",data[0])[1])[0]
+                np = re.split("np:", re.split("\)\:",data[0])[0])[1]
+                #print(re.split("\+", re.split("\)\:",data[0])[1])[0])
                 if lnl == '':
-                    lnl = float(re.split(":",re.split("  ",data[0])[3])[1])
+                    #print(re.split(":",re.split("  ",data[0])[1])[2])
+                    lnl = float(re.split(":",re.split("  ",data[0])[1])[2])
             if "???" in lines[i]:
                 stop = "1"
-        print(gene_name,",",stop,",",lnl)
+        print(gene_name,",",stop,",",np,",",lnl)
 ####################################################################
     elif runmode == "-3":
         # Pairwise Bayesian estimation of dN/dS

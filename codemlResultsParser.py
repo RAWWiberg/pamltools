@@ -181,7 +181,7 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
             # only two branch types are allowed: foreground and background
             # output file will be formatted a particular way.
             for i in range(0,len(lines)):
-                if "lnL(ntime: " in lines[i]:
+                if "lnL(ntime:" in lines[i]:
                     # get lnL estimate and np (number of parameters)
                     lnL_line = lines[i]
                     lnL_line = re.split(":", lnL_line)

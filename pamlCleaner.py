@@ -43,9 +43,9 @@ def pamlcleaner(phy,min_aln_l):
         # convert each string into a seq object which can be checked by
         # BioPython functions
         seqs = [SeqRecord(Seq(seq, alphabet = Gapped(generic_dna, "-"))) for seq in seqs]
-        if len(seqs) != int(head[1]):
+        if len(seqs) != int(head[0]):
             # number of sequences does not match header
-            sys.stderr.write("more sequences than mentioned in file header: "+
+            sys.stderr.write("number of sequences does not match header: "+
                              phy+" EXITING!\n")
             # Remove the file and exit
             os.remove(output)
@@ -60,7 +60,7 @@ def pamlcleaner(phy,min_aln_l):
                                     # remove the file and exit
                 os.remove(output)
                 sys.exit()
-            if len(s.seq) != int(head[2]) or (int(head[2])-3)%3 != 0:
+            if len(s.seq) != int(head[1]) or (int(head[1])-3)%3 != 0:
                 # sequence not same length as described in header
                 sys.stderr.write("sequence lengths do not correspond"+
                                  " to header OR not a multiple of 3 "+
@@ -73,7 +73,7 @@ def pamlcleaner(phy,min_aln_l):
         # last three bases (terminal STOP codon))
         if end_stop == 1:
             # Write the sequence minus the last three bases for each codon.
-            head[2] = str(int(head[2])-3)
+            head[1] = str(int(head[1])-3)
             outputfile.write(' '.join(head)+'\n')
             for i in range(0,len(ids)):
                 outputfile.write(ids[i]+'  '+str(seqs[i].seq)[:-3]+'\n')

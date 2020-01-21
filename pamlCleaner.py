@@ -29,7 +29,7 @@ def pamlcleaner(phy,min_aln_l):
     # reads in contents of phylip file to a list, if file is too large
     # this might be a problem
     content = [i.replace('\n', '') for i in content]
-    head = content[0].split(' ')
+    head = content[0].split()
     # Check if alignment length is > min_aln_l
     if int(head[2]) > min_aln_l:
         seqs = [] # everything in file except header

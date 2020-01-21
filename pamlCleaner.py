@@ -31,7 +31,7 @@ def pamlcleaner(phy,min_aln_l):
     content = [i.replace('\n', '') for i in content]
     head = content[0].split()
     # Check if alignment length is > min_aln_l
-    if int(head[2]) > min_aln_l:
+    if int(head[1]) > min_aln_l:
         seqs = [] # everything in file except header
         ids = []
         for line in content[1:]:

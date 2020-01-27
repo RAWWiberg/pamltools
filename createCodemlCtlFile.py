@@ -15,7 +15,7 @@ import csv
 import argparse
 import re
 def codemlfile(args):
-    gene = re.split(".", args['seqfile'])[0]
+    gene = re.split("\.", args['seqfile'])[0]
     if int(args['runmode']) < 0:
         # runmode -2 or -3 runs pairwise models
         # no "model" will be specified

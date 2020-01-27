@@ -199,9 +199,9 @@ if __name__ == "__main__":
  #   parser.add_argument('-RateAncestor', default = 0,
  #                       help = '0 or 1, 1 forces more analysis')
  
- #   parser.add_argument('-getSE', nargs = '?', const = 1,
-    default = 0,
- #                       help = 'estimate SE? (boolean)')
+    parser.add_argument('-getSE', nargs = '?', const = 1,
+                        default = 0,
+                        help = 'estimate SE? (boolean)')
     
  #   parser.add_argument('-Small_Diff', default = 1e-6
  #                       help = 'small value used in differentials')

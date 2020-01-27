@@ -104,7 +104,7 @@ def codemlfile(args):
         if args[opt] == '*':
             pass
         else:
-            if opt != 'handle' or opt != 'fspl':
+            if opt != 'handle' and opt != 'fspl':
                 ctlfile.writerow([opt, "=", args[opt]])
 
         

@@ -170,8 +170,7 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                         tree_ds=tree_ds.replace("\n","")
                         tree_ds=tree_ds.split(":")[1]
                     
-            if w_tree_line == "none" or ds_tree_line == "none"\
-            or dn_tree_line == "none":
+            if ds_tree_line == "none" or dn_tree_line == "none":
                 # no calculations performed by CODEML. Sequences ambiguous.
                 print(gene_name,",","no_data")
             else:

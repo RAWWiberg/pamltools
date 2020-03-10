@@ -185,7 +185,7 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
             # and 4 site classes within a sequence
             # only two branch types are allowed: foreground and background
             # output file will be formatted a particular way.
-            print(gene_name)
+            #print(gene_name)
             for i in range(0,len(lines)):
                 if "lnL(ntime:" in lines[i]:
                     # get lnL estimate and np (number of parameters)

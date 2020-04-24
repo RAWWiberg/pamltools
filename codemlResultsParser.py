@@ -169,6 +169,11 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                         tree_ds=lines[i]
                         tree_ds=tree_ds.replace("\n","")
                         tree_ds=tree_ds.split(":")[1]
+                    
+            if ds_tree_line == "none" or dn_tree_line == "none":
+                # no calculations performed by CODEML. Sequences ambiguous.
+                print(gene_name,",","no_data")
+            else:
                 print(gene_name,",",stop,",",N,",",S,",",tree_dn,",",tree_ds,",",\
                       dn,",",ds,",",",".join(w_line),",",lnL,",",np,",",model)
                     
@@ -180,6 +185,7 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
             # and 4 site classes within a sequence
             # only two branch types are allowed: foreground and background
             # output file will be formatted a particular way.
+            #print(gene_name)
             for i in range(0,len(lines)):
                 if "lnL(ntime:" in lines[i]:
                     # get lnL estimate and np (number of parameters)

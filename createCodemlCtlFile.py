@@ -15,7 +15,7 @@ import csv
 import argparse
 import re
 def codemlfile(args):
-    gene = re.split(".best.nuc_clean", args['seqfile'])[0]
+    gene = re.split(args['fspl'], args['seqfile'])[0]
     if int(args['runmode']) < 0:
         # runmode -2 or -3 runs pairwise models
         # no "model" will be specified
@@ -24,26 +24,26 @@ def codemlfile(args):
             ctlfilename = gene+"_fo_pw"\
                           +"_rm"+str(args['runmode'])\
                           +"_NSs"+str(args['NSsites'])\
-                          +"_"+args['handle']\
+                          +args['handle']\
                           +".ctl"
             ctlfile = csv.writer(open(ctlfilename,'w'),delimiter = " ")
             args['outfile'] = gene+"_fo_pw"\
                               +"_rm"+str(args['runmode'])\
                               +"_NSs"+str(args['NSsites'])\
-                              +"_"+args['handle']\
+                              +args['handle']\
                               +".results.txt"
         else:
             ctlfilename = gene+"_eo_pw"\
                           +"_rm"+str(args['runmode'])\
                           +"_NSs"+str(args['NSsites'])\
-                          +"_"+args['handle']\
+                          +args['handle']\
                           +".ctl"
             
             ctlfile = csv.writer(open(ctlfilename,'w'),delimiter = " ")
             args['outfile'] = gene+"_eo_pw"\
                               +"_rm"+str(args['runmode'])\
                               +"_NSs"+str(args['NSsites'])\
-                              +"_"+args['handle']\
+                              +args['handle']\
                               +".results.txt"
     elif int(args['runmode']) == 0:
         # any value for runmode >= 0 runs phylogenetic models
@@ -53,25 +53,25 @@ def codemlfile(args):
             ctlfilename = gene+"_rm"+args['runmode']\
                           +"_fo_Model"+str(args['model'])\
                           +"_NSs"+str(args['NSsites'])\
-                          +"_"+args['handle']\
+                          +args['handle']\
                           +".ctl"
             ctlfile = csv.writer(open(ctlfilename,'w'),delimiter = " ")
             args['outfile'] = gene+"_rm"+args['runmode']\
                               +"_fo_Model"+str(args['model'])\
                               +"_NSs"+str(args['NSsites'])\
-                              +"_"+args['handle']\
+                              +args['handle']\
                               +".results.txt"
         else:
             ctlfilename = gene+"_rm"+args['runmode']\
                           +"_eo_Model"+str(args['model'])\
                           +"_NSs"+str(args['NSsites'])\
-                          +"_"+args['handle']\
+                          +args['handle']\
                           +".ctl"
             ctlfile = csv.writer(open(ctlfilename,'w'),delimiter = " ")
             args['outfile'] = gene+"_rm"+args['runmode']\
                               +"_eo_Model"+str(args['model'])\
                               +"_NSs"+str(args['NSsites'])\
-                              +"_"+args['handle']\
+                              +args['handle']\
                               +".results.txt"
     else:
         # runmode any other value > 2
@@ -79,32 +79,32 @@ def codemlfile(args):
             ctlfilename = gene+"_rm"+args['runmode']\
                           +"_fo_Model"+str(args['model'])\
                           +"_NSs"+str(args['NSsites'])\
-                          +"_"+args['handle']\
+                          +args['handle']\
                           +".ctl"
             ctlfile = csv.writer(open(ctlfilename,'w'),delimiter = " ")
             args['outfile'] = gene+"_rm"+args['runmode']\
                               +"_fo_Model"+str(args['model'])\
                               +"_NSs"+str(args['NSsites'])\
-                              +"_"+args['handle']\
+                              +args['handle']\
                               +".results.txt"
         else:
            ctlfilename = gene+"_rm"+args['runmode']\
                           +"_eo_Model"+str(args['model'])\
                           +"_NSs"+str(args['NSsites'])\
-                          +"_"+args['handle']\
+                          +args['handle']\
                           +".ctl"
            ctlfile = csv.writer(open(ctlfilename,'w'),delimiter = " ")
            args['outfile'] = gene+"_rm"+args['runmode']\
                               +"_eo_Model"+str(args['model'])\
                               +"_NSs"+str(args['NSsites'])\
-                              +"_"+args['handle']\
+                              +args['handle']\
                               +".results.txt"
     
     for opt in args.keys():
         if args[opt] == '*':
             pass
         else:
-            if opt != 'handle':
+            if opt != 'handle' and opt != 'fspl':
                 ctlfile.writerow([opt, "=", args[opt]])
 
         
@@ -115,10 +115,14 @@ if __name__ == "__main__":
     parser.add_argument('-seqfile',
                        help = 'sequence file name')
 
+    parser.add_argument('-fspl',
+                       help = 'character(s) at which filename should be split (should not be special characters)')
+
+
     parser.add_argument('-treefile', default = '*',
                         help = 'phylogenetic tree file name')
 
-    parser.add_argument('-handle',default = "run",
+    parser.add_argument('-handle',default = "",
                         help = 'handle to add to beginning of output\n\
                         files and .ctl files in case there are several \n\
                         similar models being run')
@@ -199,9 +203,9 @@ if __name__ == "__main__":
  #   parser.add_argument('-RateAncestor', default = 0,
  #                       help = '0 or 1, 1 forces more analysis')
  
- #   parser.add_argument('-getSE', nargs = '?', const = 1,
-    default = 0,
- #                       help = 'estimate SE? (boolean)')
+    parser.add_argument('-getSE', nargs = '?', const = 1,
+                        default = 0,
+                        help = 'estimate SE? (boolean)')
     
  #   parser.add_argument('-Small_Diff', default = 1e-6
  #                       help = 'small value used in differentials')

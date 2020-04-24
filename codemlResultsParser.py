@@ -226,11 +226,12 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
                     c1fw=frgrndw_line[3]
                     c2afw=frgrndw_line[4]
                     c2bfw=frgrndw_line[5]
+            #print(gene_name)
             print(gene_name,\
                   ",",c0p,",",c1p,",",c2ap,",",c2bp,\
                   ",",c0bw,",",c1bw,",",c2abw,",",c2bbw,\
                   ",",c0fw,",",c1fw,",",c2afw,",",c2bfw,\
-                  lnL,",",np,",",stop,",",model)
+                  ",",lnL,",",np,",",stop,",",model)
 ####################################################################
     elif runmode == "0" and om == "fixed" and model == "2":
         #print "NOT WRITTEN THIS PART OF PARSER YET"
@@ -371,7 +372,7 @@ def parse_codeml_results(fil,runmode,om,model,nssites,gene_name,out):
             print(gene_name,",",c0p,",",c1p,",",c2ap,",",c2bp,\
                   ",",c0bw,",",c1bw,",",c2abw,",",c2bbw,\
                   ",",c0fw,",",c1fw,",",c2afw,",",c2bfw,\
-                  lnL,",",np,",",stop,",",model)
+                  ",",lnL,",",np,",",stop,",",model)
 
 ####################################################################
     elif runmode == "0" and om == "est" and model == "0":

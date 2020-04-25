@@ -8,13 +8,16 @@ library("optparse")
 #set<-"ovaries2"
 #sp<-c("Maclig_20180705","Maclig_37v3","Mac112_3462_20180705","Macmin_3429_20180705","Macmed_2294_20180705","Mac003_3326_20180705","Mac088_2936_20180705","Mac101_3113_20180705","Mac108_3220_20180705","Mac094_2994_20180705","Mac103_3118_20180705")
 #---------------------------------------------------#
-treefile<-"~/Projects/macrostomum/data/transcriptome_assemblies/2018_assemblies/phylogenomics/SM_Dez18_astral_subset.tre"
+treefile<-"~/projects/macrostomum/data/transcriptome_assemblies/2018_assemblies/phylogenomics/IQtree_raw_output_subset.tre"
 # Options List
 option_list = list(
   make_option(c("-s", "--set"), type="character", default=NULL, 
               help="which gene set", metavar="character"),
   make_option(c("-l", "--labels"), type="character", default=NULL, 
-              help="file of table of branches to label", metavar="character")
+              help="file of table of branches to label", metavar="character"),
+  make_option(c("-a", "--alns"), type="character", default=NULL, 
+              help="which alns to use", metavar="character")
+  
   );
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser)
@@ -24,7 +27,7 @@ cat("Pruning trees for: ",opt$set,"...\n")
 # List the files for each orthogroup
 #files<-list.files(paste("~/Projects/macrostomum/data/arbore_2014/orthofinder_ogs/",set,"/cds",sep=""),pattern = ".list")
 files<-list.files(paste("~/Projects/macrostomum/data/reproduction_related_genes/",
-                        opt$set,"/alns_noRedBris",sep=""),
+                        opt$set,"/",opt$set,sep=""),
                   pattern = "_sp.list")
 dat<-data.frame(og=gsub("_sp.list","",files),
                 nsp=vector(length=length(files)),
@@ -42,7 +45,7 @@ if(is.null(opt$labels)){
     # Get base name for OrthoGroup
     f<-gsub(pattern = ".list",replacement = "",f)
     # Scan the species list
-    sp<-scan(paste("~/Projects/macrostomum/data/reproduction_related_genes/",opt$set,"/alns_noRedBris/",f,".list",sep=""),what = "character")
+    sp<-scan(paste("~/projects/macrostomum/data/reproduction_related_genes/",opt$set,"/",opt$set,"/",f,".list",sep=""),what = "character")
     dat$nsp[dat$og==gsub("_sp","",f)]<-length(sp)
     # If nr species < 4; don't do anything
     if(length(sp) >= 4){
@@ -66,16 +69,16 @@ if(is.null(opt$labels)){
       mac_tree_sub$edge.length<-NULL
 
       write.tree(unroot(mac_tree_sub),
-                 file = paste("~/Projects/macrostomum/data/reproduction_related_genes/",
+                 file = paste("~/projects/macrostomum/data/reproduction_related_genes/",
                               opt$set,"/alns/",f,".tree",sep=""))
     }
   }
   write.table(dat,
-              paste("~/Projects/macrostomum/data/reproduction_related_genes/",opt$set,"/alns_noRedBris/og_species_data_null.tab",sep=""),
+              paste("~/projects/macrostomum/data/reproduction_related_genes/",opt$set,"/",opt$set,"/og_species_data_null.tab",sep=""),
               row.names = FALSE,col.names=TRUE,quote=FALSE,sep="\t")
 }else{
   # Read in the labelling table
-  lab_spp<-read.table(paste("~/Projects/macrostomum/data/morphology_behaviour/",opt$labels,".csv",sep=""),
+  lab_spp<-read.table(paste("~/projects/macrostomum/data/morphology_behaviour/",opt$labels,".csv",sep=""),
                       header=TRUE,sep=",")
   # If tip labels include species in lab_spp, add " #X" to the name.
   # number of labels depends on number of columns in the lab_spp table
@@ -83,15 +86,15 @@ if(is.null(opt$labels)){
   labs<-paste("#",0:(ncol(lab_spp)-1),sep="")
   ids<-paste(labs,"=",colnames(lab_spp),sep="")
   write.table(cbind(labs,ids),
-              paste("~/Projects/macrostomum/data/reproduction_related_genes/",
+              paste("~/projects/macrostomum/data/reproduction_related_genes/",
                     opt$set,
-                    "/alns_noRedBris/",
+                    "/",opt$set,"/",
                     opt$labels,"_treelabels.tab",sep=""),quote=FALSE,col.names=FALSE,row.names=FALSE,sep=",")
   for(f in files){
     # Get base name for OrthoGroup
     f<-gsub(pattern = ".list",replacement = "",f)
     # Scan the species list
-    sp<-scan(paste("~/Projects/macrostomum/data/reproduction_related_genes/",opt$set,"/alns_noRedBris/",f,".list",sep=""),
+    sp<-scan(paste("~/projects/macrostomum/data/reproduction_related_genes/",opt$set,"/",opt$set,"/",f,".list",sep=""),
              what = "character")
     dat$nsp[dat$og==gsub("_sp","",f)]<-length(sp)
     if(length(sp)>=4){
@@ -115,8 +118,8 @@ if(is.null(opt$labels)){
       mac_tree_sub$edge.length<-NULL
       
       write.tree(unroot(mac_tree_sub),
-                 file = paste("~/Projects/macrostomum/data/reproduction_related_genes/",
-                              opt$set,"/alns_noRedBris/",f,".tree",sep=""))
+                 file = paste("~/projects/macrostomum/data/reproduction_related_genes/",
+                              opt$set,"/",opt$set,"/",f,".tree",sep=""))
       n_labsp<-rep(0,ncol(lab_spp))
       labsp<-vector(length = ncol(lab_spp))
       for(col in 1:ncol(lab_spp)){
@@ -138,14 +141,14 @@ if(is.null(opt$labels)){
         mac_tree_sub$node.label<-NULL
         mac_tree_sub$edge.length<-NULL
         write.tree(unroot(mac_tree_sub),
-                   file = paste("~/Projects/macrostomum/data/reproduction_related_genes/",
-                                opt$set,"/alns_noRedBris/",f,"_",opt$labels,".tree",sep=""))
+                   file = paste("~/projects/macrostomum/data/reproduction_related_genes/",
+                                opt$set,"/",opt$set,"/",f,"_",opt$labels,".tree",sep=""))
       }
     }
   }
   write.table(dat,
-              paste("~/Projects/macrostomum/data/reproduction_related_genes/",opt$set,
-                    "/alns_noRedBris/og_species_data_",opt$labels,".tab",sep=""),
+              paste("~/projects/macrostomum/data/reproduction_related_genes/",opt$set,
+                    "/",opt$set,"/og_species_data_",opt$labels,".tab",sep=""),
               row.names = FALSE,col.names=TRUE,quote=FALSE,sep="\t")
 }
 
